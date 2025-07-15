@@ -1,0 +1,296 @@
+openapi: 3.0.0
+info:
+  title: Flash Card Study App API
+  description: API for managing users, decks, and cards in a flashcard study application.
+  version: 1.0.0
+servers:
+  - url: http://localhost:8080/api
+paths:
+  /users:
+    post:
+      summary: Create a new user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateUserRequest'
+      responses:
+        '201':
+          description: User created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+    get:
+      summary: Search users by username
+      parameters:
+        - in: query
+          name: username
+          schema:
+            type: string
+          description: Search users by username (partial match)
+      responses:
+        '200':
+          description: List of users
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+  /users/{userId}:
+    get:
+      summary: Get a user by ID
+      parameters:
+        - in: path
+          name: userId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: User retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+
+  /decks:
+    post:
+      summary: Create a deck (optionally with cards)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateDeckRequest'
+      responses:
+        '201':
+          description: Deck created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Deck'
+    get:
+      summary: Search decks by name
+      parameters:
+        - in: query
+          name: name
+          schema:
+            type: string
+          description: Search decks by name (partial match)
+      responses:
+        '200':
+          description: List of decks
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Deck'
+
+  /decks/{deckId}:
+    get:
+      summary: Get a single deck by ID
+      parameters:
+        - in: path
+          name: deckId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Deck retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Deck'
+    patch:
+      summary: Update deck (partial)
+      parameters:
+        - in: path
+          name: deckId
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateDeckRequest'
+      responses:
+        '200':
+          description: Deck updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Deck'
+    delete:
+      summary: Delete a deck (also deletes its cards)
+      parameters:
+        - in: path
+          name: deckId
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Deck deleted
+
+  /cards:
+    post:
+      summary: Create a card and add it to a deck
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                deckId:
+                  type: string
+                front:
+                  type: string
+                back:
+                  type: string
+              required:
+                - deckId
+                - front
+                - back
+      responses:
+        '201':
+          description: Card created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Card'
+
+  /cards/{cardId}:
+    patch:
+      summary: Update card (partial)
+      parameters:
+        - in: path
+          name: cardId
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateCardRequest'
+      responses:
+        '200':
+          description: Card updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Card'
+    delete:
+      summary: Delete a card
+      parameters:
+        - in: path
+          name: cardId
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Card deleted
+
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: string
+        username:
+          type: string
+      required:
+        - id
+        - username
+    CreateUserRequest:
+      type: object
+      properties:
+        username:
+          type: string
+      required:
+        - username
+    Deck:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        userId:
+          type: string
+        cards:
+          type: array
+          items:
+            $ref: '#/components/schemas/Card'
+      required:
+        - id
+        - name
+        - userId
+        - cards
+    CreateDeckRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        userId:
+          type: string
+        cards:
+          type: array
+          items:
+            $ref: '#/components/schemas/CreateCardRequest'
+      required:
+        - name
+        - userId
+    UpdateDeckRequest:
+      type: object
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+    Card:
+      type: object
+      properties:
+        id:
+          type: string
+        front:
+          type: string
+        back:
+          type: string
+      required:
+        - id
+        - front
+        - back
+    CreateCardRequest:
+      type: object
+      properties:
+        front:
+          type: string
+        back:
+          type: string
+      required:
+        - front
+        - back
+    UpdateCardRequest:
+      type: object
+      properties:
+        front:
+          type: string
+        back:
+          type: string
+   description: AI-powered deck generation
