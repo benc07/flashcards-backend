@@ -39,6 +39,7 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/User'
+
   /users/{userId}:
     get:
       summary: Get a user by ID
@@ -139,6 +140,23 @@ paths:
         '204':
           description: Deck deleted
 
+  /decks/generate:
+    post:
+      summary: Generate a new deck based on a topic and max number of cards
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenerateDeckRequest'
+      responses:
+        '201':
+          description: Generated deck
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Deck'
+
   /cards:
     post:
       summary: Create a card and add it to a deck
@@ -213,6 +231,7 @@ components:
       required:
         - id
         - username
+
     CreateUserRequest:
       type: object
       properties:
@@ -220,6 +239,7 @@ components:
           type: string
       required:
         - username
+
     Deck:
       type: object
       properties:
@@ -240,6 +260,7 @@ components:
         - name
         - userId
         - cards
+
     CreateDeckRequest:
       type: object
       properties:
@@ -256,6 +277,7 @@ components:
       required:
         - name
         - userId
+
     UpdateDeckRequest:
       type: object
       properties:
@@ -263,6 +285,7 @@ components:
           type: string
         description:
           type: string
+
     Card:
       type: object
       properties:
@@ -276,6 +299,7 @@ components:
         - id
         - front
         - back
+
     CreateCardRequest:
       type: object
       properties:
@@ -286,6 +310,7 @@ components:
       required:
         - front
         - back
+
     UpdateCardRequest:
       type: object
       properties:
@@ -293,4 +318,20 @@ components:
           type: string
         back:
           type: string
-   description: AI-powered deck generation
+
+    GenerateDeckRequest:
+      type: object
+      properties:
+        topic:
+          type: string
+          description: Topic for the generated deck (e.g., "Biology", "JavaScript Basics")
+        maxCards:
+          type: integer
+          description: Maximum number of cards to generate
+        userId:
+          type: string
+          description: The ID of the user for whom the deck is created
+      required:
+        - topic
+        - maxCards
+        - userId
